@@ -3,34 +3,10 @@
 
 #include <iostream>
 #include <stdexcept>
-#include <vector>
-#include <cstring>
 #include <cstdlib>
-#include <optional>
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
-
-const std::vector<const char*> validationLayers =
-	{
-		"VK_LAYER_KHRONOS_validation"
-	};
-
-#ifdef NDEBUG
-	const bool enableValidationLayers = false;
-#else
-	const bool enableValidationLayers = true;
-#endif
-
-struct QueueFamilyIndices
-	{
-		std::optional<uint32_t> graphicsFamily;
-
-		bool isComplete()
-			{
-				return graphicsFamily.has_value();
-			}
-	};
 
 class HelloTriangleApplication
 	{
@@ -42,11 +18,11 @@ class HelloTriangleApplication
 					mainLoop();
 					cleanup();
 				}
+
 		private:
 			GLFWwindow* window;
-			VkInstance instance;
 
-			VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+			VkInstance instance;
 
 			void initWindow()
 				{
@@ -57,10 +33,12 @@ class HelloTriangleApplication
 
 					window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
 				}
+
 			void initVulkan()
 				{
 					createInstance();
 				}
+
 			void mainLoop()
 				{
 					while (!glfwWindowShouldClose(window))
@@ -68,6 +46,7 @@ class HelloTriangleApplication
 							glfwPollEvents();
 						}
 				}
+
 			void cleanup()
 				{
 					vkDestroyInstance(instance, nullptr);
@@ -76,6 +55,7 @@ class HelloTriangleApplication
 
 					glfwTerminate();
 				}
+
 			void createInstance()
 				{
 					VkApplicationInfo appInfo{};
@@ -99,124 +79,10 @@ class HelloTriangleApplication
 
 					createInfo.enabledLayerCount = 0;
 
-					if (enableValidationLayers)
-						{
-							createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-							createInfo.ppEnabledLayerNames = validationLayers.data();
-						}
-					else
-						{
-							createInfo.enabledLayerCount = 0;
-						}
-
 					if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)
 						{
 							throw std::runtime_error("failed to create instance!");
 						}
-				}
-
-			void pickPhysicalDevice()
-				{
-					uint32_t deviceCount = 0;
-					vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
-
-					if (deviceCount == 0)
-						{
-							throw std::runtime_error("failed to find GPUs with Vulkan support!");
-						}
-
-					std::vector<VkPhysicalDevice> devices(deviceCount);
-					vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
-
-					for (const auto& device : devices)
-						{
-							if (isDeviceSuitable(device))
-								{
-									physicalDevice = device;
-									break;
-								}
-						}
-
-					if (physicalDevice == VK_NULL_HANDLE)
-						{
-							throw std::runtime_error("failed to find a suitable GPU!");
-						}
-			}
-			bool isDeviceSuitable(VkPhysicalDevice device)
-				{
-					QueueFamilyIndices indices = findQueueFamilies(device);
-
-					return indices.isComplete();
-				}
-			QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device)
-				{
-					QueueFamilyIndices indices;
-					// Assign index to queue families that could be found
-
-					uint32_t queueFamilyCount = 0;
-					vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
-
-					std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-					vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
-
-					int i = 0;
-					for (const auto& queueFamily : queueFamilies)
-						{
-							if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
-								{
-									indices.graphicsFamily = i;
-								}
-							if (indices.isComplete())
-								{
-									break;
-								}
-							i++;
-						}
-
-					return indices;
-				}
-			std::vector<const char*> getRequiredExtensions()
-				{
-					uint32_t glfwExtensionCount = 0;
-					const char** glfwExtensions;
-					glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-
-					std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
-
-					if (enableValidationLayers)
-						{
-							extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-						}
-
-					return extensions;
-				}
-			bool checkValidationLayerSupport()
-				{
-					uint32_t layerCount;
-					vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-
-					std::vector<VkLayerProperties> availableLayers(layerCount);
-					vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
-
-					for (const char* layerName : validationLayers)
-						{
-							bool layerFound = false;
-
-							for (const auto& layerProperties : availableLayers)
-								{
-									if (strcmp(layerName, layerProperties.layerName) == 0)
-										{
-											layerFound = true;
-											break;
-										}
-								}
-
-							if (!layerFound)
-								{
-									return false;
-								}
-						}
-					return false;
 				}
 	};
 
@@ -233,5 +99,6 @@ int main()
 				std::cerr << e.what() << std::endl;
 				return EXIT_FAILURE;
 			}
+
 		return EXIT_SUCCESS;
 	}
