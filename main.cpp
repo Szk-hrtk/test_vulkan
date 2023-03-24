@@ -69,33 +69,33 @@ class HelloTriangleApplication
 					window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
 				}
 
-		void initVulkan()
-			{
-				createInstance();
-				setupDebugMessenger();
-			}
+			void initVulkan()
+				{
+					createInstance();
+					setupDebugMessenger();
+				}
 
-		void mainLoop()
-			{
-				while (!glfwWindowShouldClose(window))
-					{
-						glfwPollEvents();
-					}
-			}
+			void mainLoop()
+				{
+					while (!glfwWindowShouldClose(window))
+						{
+							glfwPollEvents();
+						}
+				}
 
-		void cleanup()
-			{
-				if (enableValidationLayers)
-					{
-						DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
-					}
+			void cleanup()
+				{
+					if (enableValidationLayers)
+						{
+							DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
+						}
 
-				vkDestroyInstance(instance, nullptr);
+					vkDestroyInstance(instance, nullptr);
 
-				glfwDestroyWindow(window);
+					glfwDestroyWindow(window);
 
-				glfwTerminate();
-			}
+					glfwTerminate();
+				}
 
 		void createInstance()
 			{
